@@ -17,18 +17,32 @@ import {
 
 // Mapping all skill elements to clean solid icons to ensure Vite bundles correctly
 const AVAILABLE_SKILLS = [
-  { name: 'React.js', icon: faCode },
-  { name: 'Node.js', icon: faServer },
-  { name: 'Java', icon: faCubes },
-  { name: 'JavaScript', icon: faTerminal },
-  { name: 'TypeScript', icon: faTerminal },
-  { name: 'Python', icon: faTerminal },
-  { name: 'Next.js', icon: faLayerGroup },
-  { name: 'Express.js', icon: faServer },
-  { name: 'SQL', icon: faDatabase },
-  { name: 'MongoDB', icon: faDatabase },
-  { name: 'Docker', icon: faBoxOpen },
-  { name: 'Git', icon: faCodeBranch }
+  'Software Engineering',
+  'Computer Science',
+  'Science',
+  'Mathematics',
+  'Physics',
+  'Chemistry',
+  'Biology',
+  'JEE',
+  'NEET',
+  'React.js',
+  'Node.js',
+  'Java',
+  'JavaScript',
+  'TypeScript',
+  'Python',
+  'Next.js',
+  'Express.js',
+  'SQL',
+  'MongoDB',
+  'Docker',
+  'Git',
+  'C++',
+  'DSA',
+  'Cyber Security',
+  'Machine Learning',
+  'Artificial Intelligence'
 ];
 
 export default function Profile() {
@@ -40,9 +54,36 @@ export default function Profile() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [skillSearch, setSkillSearch] = useState('');
+const [customSkill, setCustomSkill] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
   // Fetch verified structural attributes from backend configuration
+
+  const handleAddCustomSkill = () => {
+  const skill = customSkill.trim();
+
+  if (!skill) return;
+
+  const exists = formData.skills.some(
+    item => item.toLowerCase() === skill.toLowerCase()
+  );
+
+  if (!exists) {
+    setFormData(prev => ({
+      ...prev,
+      skills: [...prev.skills, skill]
+    }));
+  }
+
+  setCustomSkill('');
+};
+
+const filteredSkills = AVAILABLE_SKILLS.filter(skill =>
+  skill.toLowerCase().includes(skillSearch.toLowerCase())
+);
+
+
   useEffect(() => {
     api.get('/auth/profile')
       .then(({ data }) => setFormData({
