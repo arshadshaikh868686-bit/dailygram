@@ -6,19 +6,63 @@ exports.profileController = async (req, res) => {
 
 exports.UpdateProfile = async (req, res) => {
     try {
-        const { name, skills } = req.body;
+        const { name, skills, role } = req.body;
+
         const update = {};
-        if (name !== undefined) update.name = String(name).trim();
+
+        if (name !== undefined) {
+            update.name = String(name).trim();
+        }
+
         if (skills !== undefined) {
-            if (!Array.isArray(skills)) return res.status(400).json({ message: 'skills must be an array' });
+            if (!Array.isArray(skills)) {
+                return res.status(400).json({
+                    message: 'skills must be an array'
+                });
+            }
+
             update.skills = skills;
         }
-        if (update.name === '') return res.status(400).json({ message: 'name cannot be empty' });
 
-        const user = await User.findByIdAndUpdate(req.user._id, { $set: update }, { new: true, runValidators: true }).select('-password');
-        if (!user) return res.status(404).json({ message: 'User not found' });
-        res.status(200).json({ message: 'Profile updated successfully', user });
+        if (role !== undefined) {
+            if (!['mentor', 'learner'].includes(role)) {
+                return res.status(400).json({
+                    message: 'role must be mentor or learner'
+                });
+            }
+
+            update.role = role;
+        }
+
+        if (update.name === '') {
+            return res.status(400).json({
+                message: 'name cannot be empty'
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            { $set: update },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            user
+        });
+
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({
+            message: err.message
+        });
     }
 };
