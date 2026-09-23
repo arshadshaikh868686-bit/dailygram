@@ -2,49 +2,56 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true, minlength: 6 },
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+
+    password: {
+        type: String,
+        required: true,
+        minlength: 6
+    },
+
+    // Dynamic skills
     skills: [{
         type: String,
-        enum: [
-            'React.js', 
-            'Node.js', 
-            'Java', 
-            'JavaScript', 
-            'TypeScript', 
-            'Python', 
-            'Next.js', 
-            'Express.js', 
-            'SQL', 
-            'MongoDB', 
-            'Docker', 
-            'Git'
-        ]
+        trim: true
     }],
+
     role: {
         type: String,
         enum: ['mentor', 'learner'],
         required: true
     }
+
 }, { timestamps: true });
 
 UserSchema.pre('save', async function () {
     if (!this.isModified('password')) {
-        return; 
+        return;
     }
 
     try {
         this.password = await bcrypt.hash(this.password, 10);
-         
     } catch (err) {
-    throw err; 
+        throw err;
     }
 });
 
-UserSchema.methods.comparePassword = function(typePassword) {
+UserSchema.methods.comparePassword = function (typePassword) {
     return bcrypt.compare(typePassword, this.password);
 };
 
 const User = mongoose.model('User', UserSchema);
+
 module.exports = User;
