@@ -22,7 +22,6 @@ const UserSchema = new mongoose.Schema({
         minlength: 6
     },
 
-    // Dynamic skills
     skills: [{
         type: String,
         trim: true
@@ -37,21 +36,13 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 UserSchema.pre('save', async function () {
-    if (!this.isModified('password')) {
-        return;
-    }
+    if (!this.isModified('password')) return;
 
-    try {
-        this.password = await bcrypt.hash(this.password, 10);
-    } catch (err) {
-        throw err;
-    }
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 UserSchema.methods.comparePassword = function (typePassword) {
     return bcrypt.compare(typePassword, this.password);
 };
 
-const User = mongoose.model('User', UserSchema);
-
-module.exports = User;
+module.exports = mongoose.model('User', UserSchema);
