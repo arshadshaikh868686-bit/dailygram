@@ -11,9 +11,27 @@ const LoginController = async (req, res) => {
         const isPasswordMatch = await findUser.comparePassword(password);
         if (!isPasswordMatch) return res.status(401).json({ message: 'Invalid email or password' });
 
-        const token = jwt.sign({ userid: findUser._id }, process.env.JWT_SECRET, { expiresIn: '7h' });
-        res.status(200).json({ token, userid: findUser._id, name: findUser.name, email: findUser.email, role: findUser.role, skills: findUser.skills });
-    } catch (err) {
+        const accessToken = jwt.sign(
+    { userid: findUser._id },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+);
+
+const refreshToken = jwt.sign(
+    { userid: findUser._id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: '7d' }
+);
+res.status(200).json({
+    accessToken,
+    refreshToken,
+    userid: findUser._id,
+    name: findUser.name,
+    email: findUser.email,
+    role: findUser.role,
+    skills: findUser.skills
+});
+} catch (err) {
         res.status(500).json({ message: err.message });
     }
 };

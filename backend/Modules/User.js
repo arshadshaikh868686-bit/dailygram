@@ -29,9 +29,67 @@ const UserSchema = new mongoose.Schema({
 
     role: {
         type: String,
-        enum: ['mentor', 'learner'],
+        enum: ['mentor', 'learner', 'admin'],
         required: true
-    }
+    },
+    bio: {
+    type: String,
+    trim: true,
+    maxlength: 500,
+    default: ''
+},
+
+experience: {
+    type: Number,
+    min: 0,
+    default: 0
+},
+
+profileImage: {
+    type: String,
+    default: ''
+},
+
+rating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 0
+},
+
+completedSessions: {
+    type: Number,
+    min: 0,
+    default: 0
+},
+
+linkedinUrl: {
+    type: String,
+    trim: true,
+    default: ''
+},
+
+resumeUrl: {
+    type: String,
+    trim: true,
+    default: ''
+},
+
+aadhaarVerificationStatus: {
+    type: String,
+    enum: ['not_submitted', 'pending', 'verified', 'rejected'],
+    default: 'not_submitted'
+},
+
+premiumEligible: {
+    type: Boolean,
+    default: false
+},
+
+premiumEnabled: {
+    type: Boolean,
+    default: false
+},
 
 }, { timestamps: true });
 

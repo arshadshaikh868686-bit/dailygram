@@ -18,7 +18,7 @@ const MentorSearch = async (req, res) => {
 
         const mentors = await User
             .find(filter)
-            .select('-password')
+            .select('-password' , 'aadhaarVerificationStatus')
             .sort({ name: 1 });
 
         res.status(200).json(mentors);

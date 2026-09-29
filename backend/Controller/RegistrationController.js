@@ -17,10 +17,28 @@ const RegistrationController = async (req, res) => {
         if (userExist) return res.status(409).json({ message: 'User already exists' });
 
         const user = await User.create({ name: name.trim(), email: normalizedEmail, password, role, skills });
-        const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: '7h' });
+        const accessToken = jwt.sign(
+    { userid: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+);
 
-        res.status(201).json({ token, userid: user._id, name: user.name, email: user.email, role: user.role, skills: user.skills });
-    } catch (err) {
+const refreshToken = jwt.sign(
+    { userid: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: '7d' }
+);
+
+res.status(201).json({
+    accessToken,
+    refreshToken,
+    userid: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    skills: user.skills
+});
+} catch (err) {
         if (err.code === 11000) return res.status(409).json({ message: 'User already exists' });
         res.status(500).json({ message: err.message });
     }

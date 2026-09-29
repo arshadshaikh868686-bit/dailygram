@@ -5,6 +5,16 @@ const AppointmentSchema = new mongoose.Schema({
     mentorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['pending', 'accepted', 'rejected', 'completed'], default: 'pending' },
     skill: { type: String, required: true, trim: true },
+    scheduledAt: {
+    type: Date
+},
+
+duration: {
+    type: Number,
+    default: 60,
+    min: 15,
+    max: 180
+},
     room: { type: String, trim: true }
 }, { timestamps: true });
 

@@ -5,10 +5,45 @@ const { getIO, onlineusers } = require('../socket');
 
 exports.Booking = async (req, res) => {
     try {
-        const { mentorId, skill } = req.body;
+        const { mentorId, skill, scheduledAt, duration } = req.body;
         const learnerId = req.user._id;
 
         if (!mentorId || !skill) return res.status(400).json({ message: 'mentorId and skill are required' });
+        if (!scheduledAt) {
+    return res.status(400).json({
+        message: 'scheduledAt is required'
+    });
+}
+
+const appointmentDate = new Date(scheduledAt);
+
+if (Number.isNaN(appointmentDate.getTime())) {
+    return res.status(400).json({
+        message: 'Invalid scheduledAt'
+    });
+}
+
+if (appointmentDate <= new Date()) {
+    return res.status(400).json({
+        message: 'Appointment must be scheduled in the future'
+    });
+}
+
+const appointmentDuration = duration === undefined
+    ? 60
+    : Number(duration);
+
+if (
+    !Number.isFinite(appointmentDuration) ||
+    appointmentDuration < 15 ||
+    appointmentDuration > 180
+) {
+    return res.status(400).json({
+        message: 'duration must be between 15 and 180 minutes'
+    });
+}
+
+
         if (!mongoose.isValidObjectId(mentorId)) return res.status(400).json({ message: 'Invalid mentorId' });
         if (String(mentorId) === String(learnerId)) return res.status(400).json({ message: 'You cannot book yourself' });
 
@@ -19,7 +54,13 @@ exports.Booking = async (req, res) => {
         const existing = await Appointment.findOne({ learnerId, mentorId, skill, status: { $in: ['pending', 'accepted'] } });
         if (existing) return res.status(409).json({ message: 'An active appointment already exists', appointment: existing });
 
-        const appointment = await Appointment.create({ learnerId, mentorId, skill });
+        const appointment = await Appointment.create({
+    learnerId,
+    mentorId,
+    skill,
+    scheduledAt: appointmentDate,
+    duration: appointmentDuration
+});
         if (onlineusers[String(mentorId)]) getIO().to(onlineusers[String(mentorId)]).emit('newRequest', appointment);
 
         res.status(201).json(appointment);

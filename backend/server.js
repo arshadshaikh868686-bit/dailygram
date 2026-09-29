@@ -3,12 +3,22 @@ require('dotenv').config();
 console.log("DEBUG ENV:", process.env.JWT_SECRET ? "Loaded Successfully ✅" : "NOT FOUND (undefined) ❌")
 
 const express = require('express');
+const adminRoutes = require('./Routes/adminRoutes');
+const paymentRoutes = require('./Routes/paymentRoutes');
 const http = require('http');
 const cors = require('cors');
 const dbconnect = require('./Config/db');
 const { initSocket } = require('./socket');
+const {
+    handleRazorpayWebhook
+} = require('./Controller/PaymentController');
 
 const app = express();
+app.post(
+    '/api/payments/webhook',
+    express.raw({ type: 'application/json' }),
+    handleRazorpayWebhook
+);
 const server = http.createServer(app);
 
 const allowedOrigins = process.env.CLIENT_URL
@@ -24,9 +34,11 @@ app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
 app.use('/api/auth', require('./Routes/authRoutes'));
 app.use('/api/user', require('./Routes/userRoutes'));
+app.use('/api/payments', paymentRoutes);
 app.use('/api/appointments', require('./Routes/appointmentRoutes'));
 app.use('/api/message', require('./Routes/messageRoutes'));
 app.use('/api/ai', require('./Routes/aiRoutes'));
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 app.use((err, req, res, next) => {
