@@ -8,11 +8,19 @@ const adminProtect = require('../Middleware/adminMiddleware');
 const {
     getVerificationRequests,
     updateVerificationStatus,
+    updateMentorApproval,
     updatePremiumStatus,
     getAdminStats
 } = require('../Controller/AdminController');
 
 
+
+router.get(
+    '/stats',
+    protect,
+    adminProtect,
+    getAdminStats
+);
 
 
 
@@ -23,12 +31,27 @@ router.get(
     getVerificationRequests
 );
 
+
+
+
 router.put(
     '/verification/:id',
     protect,
     adminProtect,
     updateVerificationStatus
 );
+
+
+
+
+router.put(
+    '/mentor-approval/:id',
+    protect,
+    adminProtect,
+    updateMentorApproval
+);
+
+
 
 router.put(
     '/premium/:id',
@@ -37,11 +60,5 @@ router.put(
     updatePremiumStatus
 );
 
-router.get(
-    '/stats',
-    protect,
-    adminProtect,
-    getAdminStats
-);
 
 module.exports = router;

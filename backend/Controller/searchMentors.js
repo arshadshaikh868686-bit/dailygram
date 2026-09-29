@@ -1,34 +1,39 @@
 const User = require('../Modules/User');
 
-const MentorSearch = async (req, res) => {
+
+// ==========================================
+// GET APPROVED MENTORS
+// ==========================================
+
+exports.MentorSearch = async (req, res) => {
     try {
-        const skills = req.query.skills?.trim();
+        /*
+         * Marketplace me sirf wahi mentors dikhenge
+         * jinko admin ne approve kiya hai.
+         *
+         * Skill filter intentionally nahi hai.
+         */
 
-        const filter = {
+        const mentors = await User.find({
             role: 'mentor',
-            _id: { $ne: req.user._id }
-        };
-
-        if (skills) {
-            filter.skills = {
-                $regex: skills,
-                $options: 'i'
-            };
-        }
-
-        const mentors = await User
-            .find(filter)
-            .select('-password' , 'aadhaarVerificationStatus')
-            .sort({ name: 1 });
+            mentorApproved: true
+        })
+            .select(
+                'name skills bio experience profileImage rating completedSessions mentorshipPrice premiumEnabled'
+            )
+            .sort({
+                rating: -1,
+                completedSessions: -1,
+                createdAt: -1
+            });
 
         res.status(200).json(mentors);
 
     } catch (err) {
         console.error('Mentor search error:', err);
+
         res.status(500).json({
-            message: 'Server error'
+            message: 'Unable to fetch mentors'
         });
     }
 };
-
-module.exports = { MentorSearch };

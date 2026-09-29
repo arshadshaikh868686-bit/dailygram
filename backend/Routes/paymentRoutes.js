@@ -6,9 +6,12 @@ const protect = require('../Middleware/authMiddleware');
 
 const {
     createPremiumOrder,
-    verifyPremiumPayment
+    verifyPremiumPayment,
+    createMentorshipOrder,
+    verifyMentorshipPayment
 } = require('../Controller/PaymentController');
 
+// Premium payment
 router.post(
     '/premium/order',
     protect,
@@ -19,6 +22,19 @@ router.post(
     '/premium/verify',
     protect,
     verifyPremiumPayment
+);
+
+// Mentorship payment
+router.post(
+    '/mentorship/order',
+    protect,
+    createMentorshipOrder
+);
+
+router.post(
+    '/mentorship/verify',
+    protect,
+    verifyMentorshipPayment
 );
 
 module.exports = router;

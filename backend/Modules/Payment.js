@@ -8,6 +8,14 @@ const PaymentSchema = new mongoose.Schema(
             required: true
         },
 
+        // Used to connect a mentorship payment
+        // with the specific appointment.
+        appointmentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Appointment',
+            default: null
+        },
+
         orderId: {
             type: String,
             required: true,
@@ -32,7 +40,7 @@ const PaymentSchema = new mongoose.Schema(
 
         type: {
             type: String,
-            enum: ['premium'],
+            enum: ['premium', 'mentorship'],
             required: true
         },
 
